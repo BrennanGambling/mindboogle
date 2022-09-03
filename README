@@ -1,0 +1,48 @@
+# This file contains the old commands for building the api docs for the mindboggle website.
+# Now we are using readthedocs.org to automatically build and host the documentation
+# from the docs/ folder in the master branch of this repository.
+# gh-pages files still in use include [data, papers, people].html and the shared/ folder.
+
+# MASTER BRANCH:
+
+git checkout master
+cd doc
+make html
+cd ..
+git add -f doc/build/html/api 
+git add -f doc/build/html/faq 
+git add -f doc/build/html/users
+git add -f doc/build/html/genindex.html
+git add -f doc/build/html/documentation.html
+git commit -m "Update documentation for website."
+git push origin master
+
+# GH-PAGES BRANCH:
+
+git checkout gh-pages
+git checkout master -- doc/build/html/api
+git checkout master -- doc/build/html/faq
+git checkout master -- doc/build/html/users
+git checkout master -- doc/build/html/genindex.html
+git checkout master -- doc/build/html/documentation.html
+
+# Replace existing html pages:
+rm -r api
+rm -r faq
+rm -r users
+mv doc/build/html/* .
+
+# Replace '_static' with 'shared' in files:
+sed -i .bk 's/_static/shared/g' *.html
+sed -i .bk 's/_static/shared/g' api/generated/*.html
+sed -i .bk 's/_static/shared/g' faq/*.html
+sed -i .bk 's/_static/shared/g' users/*.html
+rm *.bk
+rm api/generated/*.bk
+rm faq/*.bk
+rm users/*.bk
+
+# Push changes:
+git add api faq users genindex.html documentation.html
+git commit -m "Update documentation for website."
+git push origin gh-pages
